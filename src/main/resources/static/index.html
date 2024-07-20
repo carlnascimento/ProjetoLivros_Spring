@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Livros</title>
+    <script>
+        async function fetchLivros() {
+            const filtro = document.getElementById("filtro").value;
+            try {
+                const response = await fetch(`http://localhost:8080/api/find/${filtro}`);
+                if (!response.ok) {
+                    throw new Error('Erro na requisição: ' + response.statusText);
+                }
+                const livros = await response.json();
+                const resultados = document.getElementById("resultados");
+                resultados.innerHTML = '';
+
+                if (livros.length > 0) {
+                    livros.forEach(livro => {
+                        const div = document.createElement('div');
+                        div.className = 'livro';
+                        div.innerHTML = `
+                            <h3>${livro.nome}</h3>
+                            <p><strong>ID:</strong> ${livro.id}</p>
+                            <p><strong>Valor:</strong> ${livro.valor}</p>
+                            <p><strong>Descrição:</strong> ${livro.descricao}</p>
+                            <p><strong>Categoria:</strong> ${livro.categoria}</p>
+                            <p><strong>Subcategoria:</strong> ${livro.subcategoria}</p>
+                        `;
+                        resultados.appendChild(div);
+                    });
+                } else {
+                    resultados.innerHTML = '<p>Nenhum livro encontrado.</p>';
+                }
+            } catch (error) {
+                const resultados = document.getElementById("resultados");
+                resultados.innerHTML = '<p>Erro ao buscar livros: ' + error.message + '</p>';
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .livro {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Consulta de Livros</h1>
+    <div>
+        <label for="filtro">Filtro: </label>
+        <input type="text" id="filtro">
+        <button onclick="fetchLivros()">Buscar</button>
+    </div>
+    <div id="resultados"></div>
+</body>
+</html>
